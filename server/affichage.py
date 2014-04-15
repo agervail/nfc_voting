@@ -4,9 +4,14 @@ import mosquitto
 from time import sleep
 import requests
 import json
+'''
+Little display of a mongodb database.
+First fetching the content of the database
+Then each time the database is modified displaying immediatly the changes
+'''
+
 
 def get_score(bd, table):
-#  import ipdb; ipdb.set_trace()
   r = requests.get('http://localhost:28017/' + bd + '/' + table + '/')
   res = json.loads(r.text)
   score = [0,0,0]
@@ -17,16 +22,17 @@ def get_score(bd, table):
 pygame.init()
 size = width, height = 600, 600
 screen = pygame.display.set_mode(size)
-pygame.display.set_caption("Resultats du vote")
+pygame.display.set_caption("Vote result")
 h_bas = height - 10
 myfont = pygame.font.SysFont("Comic Sans MS", 80)
 pink = (255, 0, 255)
 blue = (0, 255, 255)
-score = get_score('nfcDB', 'vote3')
+score = get_score('nfcDB', 'vote')
 name = ['Pour', 'Contre', 'Neutre']
+
 #MQTT part
 def on_message(mosq, msg):
-	global score
+  global score
 	print("one more for " + str(msg.payload) + str(score))
 	score[int(msg.payload)] += 1
 mqttc = mosquitto.Mosquitto("bla")

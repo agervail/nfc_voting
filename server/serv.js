@@ -21,7 +21,7 @@ var Temperature = new Schema({
     vote: Number
 });
 //Creation of the model
-var TemperatureModel = mongoose.model('vote3', Temperature);
+var TemperatureModel = mongoose.model('vote', Temperature);
  
  
 ///////////////////////////////////
@@ -29,26 +29,25 @@ var TemperatureModel = mongoose.model('vote3', Temperature);
 //////////////////////////////////
  
 client = mqtt.createClient(1883, '192.168.1.20');
-client2 = mqtt.createClient(1883, '127.0.0.1');
+client_local = mqtt.createClient(1883, '127.0.0.1');
 client.subscribe('vote');
  
 var i = 0;
 client.on('message', function(topic, message) {
     console.log(message);
     var s = message.split(' ');
-//	  console.log('fdsk' + s[1]);
     var myTemperatureModel = new TemperatureModel({_id: s[0], vote: s[1]});
     myTemperatureModel.save(function(err) {
         if (err) {
 				  if (err.err.indexOf("duplicate key" != -1)){
-						console.log('La personne a deja vote');
+						console.log('Person already voted');
 				  } else {
-						console.log('Erreur inconnue');
+						console.log('Unknown error');
 						console.log(err.err);
 				  }
         } else {
-					client2.publish('success', s[1]);
-        	console.log('Le vote a été ajouté avec succès');
+					client_local.publish('success', s[1]);
+        	console.log('Vote was successfully added');
 				}
     });
 });
